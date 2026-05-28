@@ -448,18 +448,12 @@ function Onboarding({ user, onDone }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 async function analyzeTrack(trackName) {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 300,
-        messages: [{ role: "user", content: 'Analyze this music track name and return ONLY valid JSON, no markdown. Track: "' + trackName + '". Return: {"genre":"one of Ambient/Acoustic/Jazz/Electronic/Chill/Lounge/World/Classical/Pop/Asian Fusion/Mediterranean","energy":70,"mood_tags":"2 Hebrew mood words","name":"clean name"}' }],
-      }),
+      body: JSON.stringify({ trackName }),
     });
-    const data = await res.json();
-    const text = data.content.map(i => i.text || "").join("");
-    return JSON.parse(text.replace(/```json|```/g, "").trim());
+    return await res.json();
   } catch {
     return { genre: "Ambient", energy: 60, mood_tags: "נעים,רגוע", name: trackName };
   }
