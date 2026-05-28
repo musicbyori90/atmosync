@@ -517,34 +517,30 @@ function AdminDashboard({ user, onLogout }) {
                 <input ref={fileRef} type="file" accept=".mp3,.wav,.flac,.m4a" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <input placeholder="שם הרצועה" value={uploadName} onChange={e => setUploadName(e.target.value)} style={inp} />
-                <select value={uploadGenre} onChange={e => setUploadGenre(e.target.value)} style={{ ...inp }}>
-                  {GENRE_TAGS.map(g => <option key={g}>{g}</option>)}
-                </select>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ color: T.muted, fontSize: 12 }}>אנרגיה</span>
-                    <span style={{ color: T.accent, fontSize: 12 }}>{uploadEnergy}% · {ENERGY_LABELS[Math.floor(uploadEnergy / 20)]}</span>
-                  </div>
-                  <input type="range" min={0} max={100} value={uploadEnergy} onChange={e => setUploadEnergy(+e.target.value)} style={{ width: "100%", accentColor: T.accent }} />
+              {analyzing && (
+                <div style={{ textAlign: "center", padding: 16 }}>
+                  <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 24, color: T.accent }}>⟳</span>
+                  <div style={{ color: T.accent, fontSize: 13, marginTop: 8, fontWeight: 600 }}>AI מנתח את הרצועה...</div>
                 </div>
-                <div>
-                  <div style={{ color: T.muted, fontSize: 12, marginBottom: 8 }}>מצב רוח (בחר כמה)</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                    {MOOD_TAGS.map(m => {
-                      const sel = uploadMoods.includes(m);
-                      return <button key={m} onClick={() => setUploadMoods(p => sel ? p.filter(x => x !== m) : [...p, m])} style={{ background: sel ? `${T.accent}22` : T.surface, border: `1px solid ${sel ? T.accent : T.border}`, borderRadius: 20, padding: "5px 12px", color: sel ? T.accent : T.muted, fontSize: 12, cursor: "pointer", transition: "all .2s" }}>{m}</button>;
-                    })}
+              )}
+              {analysisResult && !analyzing && (
+                <div style={{ background: `${T.accent}12`, border: `1px solid ${T.accent}44`, borderRadius: 12, padding: 16 }}>
+                  <div style={{ color: T.accent, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>✓ נותח בהצלחה</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    <span style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", color: T.text, fontSize: 12 }}>{analysisResult.genre}</span>
+                    <span style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", color: T.text, fontSize: 12 }}>⚡ {analysisResult.energy}%</span>
+                    <span style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", color: T.text, fontSize: 12 }}>{analysisResult.mood_tags}</span>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {uploading && <div style={{ textAlign: "center", color: T.accent, padding: 16 }}>
-              <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 20 }}>⟳</span>
-              <div style={{ fontSize: 13, marginTop: 8 }}>מעלה...</div>
-            </div>}
+            {uploading && !analyzing && (
+              <div style={{ textAlign: "center", color: T.accent, padding: 16 }}>
+                <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 20 }}>⟳</span>
+                <div style={{ fontSize: 13, marginTop: 8 }}>שומר לספרייה...</div>
+              </div>
+            )}
           </div>
         )}
 
