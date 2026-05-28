@@ -446,14 +446,31 @@ function Onboarding({ user, onDone }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN DASHBOARD
 // ═══════════════════════════════════════════════════════════════════════════════
+async function analyzeTrack(trackName) {
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        messages: [{ role: "user", content: 'Analyze this music track name and return ONLY valid JSON, no markdown. Track: "' + trackName + '". Return: {"genre":"one of Ambient/Acoustic/Jazz/Electronic/Chill/Lounge/World/Classical/Pop/Asian Fusion/Mediterranean","energy":70,"mood_tags":"2 Hebrew mood words","name":"clean name"}' }],
+      }),
+    });
+    const data = await res.json();
+    const text = data.content.map(i => i.text || "").join("");
+    return JSON.parse(text.replace(/```json|```/g, "").trim());
+  } catch {
+    return { genre: "Ambient", energy: 60, mood_tags: "נעים,רגוע", name: trackName };
+  }
+}
+
 function AdminDashboard({ user, onLogout }) {
   const [tab, setTab] = useState("library");
   const [tracks, setTracks] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadName, setUploadName] = useState("");
-  const [uploadGenre, setUploadGenre] = useState(GENRE_TAGS[0]);
-  const [uploadEnergy, setUploadEnergy] = useState(50);
-  const [uploadMoods, setUploadMoods] = useState([]);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef();
 
@@ -466,19 +483,27 @@ function AdminDashboard({ user, onLogout }) {
   const handleFile = async (file) => {
     if (!file) return;
     setUploading(true);
+    setAnalyzing(true);
+    setAnalysisResult(null);
+    const trackName = file.name.replace(/\.[^.]+$/, "");
+    const analysis = await analyzeTrack(trackName);
+    setAnalysisResult(analysis);
+    setAnalyzing(false);
     const path = `${Date.now()}_${file.name}`;
     let fileUrl = "";
     try { fileUrl = await sb.uploadFile("music", path, file, user.token); } catch {}
     try {
       const res = await sb.insert("tracks", {
-        name: uploadName || file.name.replace(/\.[^.]+$/, ""),
-        genre: uploadGenre, energy: uploadEnergy,
-        mood_tags: uploadMoods.join(","), file_url: fileUrl,
+        name: analysis.name || trackName,
+        genre: analysis.genre,
+        energy: analysis.energy,
+        mood_tags: analysis.mood_tags,
+        file_url: fileUrl,
       }, user.token);
       if (Array.isArray(res) && res[0]) setTracks(p => [res[0], ...p]);
     } catch {}
-    setUploadName(""); setUploadMoods([]); setUploadEnergy(50);
     setUploading(false);
+    setTimeout(() => setAnalysisResult(null), 3000);
   };
 
   return (
@@ -498,34 +523,31 @@ function AdminDashboard({ user, onLogout }) {
       </div>
 
       <div style={{ padding: 20, maxWidth: 480, margin: "0 auto" }}>
-
         {tab === "upload" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="card" style={{ padding: 20 }}>
-              <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: 16, color: T.text, marginBottom: 4 }}>העלאת רצועה חדשה</div>
-              <div style={{ color: T.muted, fontSize: 13, marginBottom: 18 }}>רק אתה יכול להעלות מוזיקה לספרייה של AtmoSync</div>
-
+              <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: 16, color: T.text, marginBottom: 4 }}>העלאת רצועה</div>
+              <div style={{ color: T.muted, fontSize: 13, marginBottom: 16 }}>גרור קובץ — AI ינתח אוטומטית</div>
               <div
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
                 onClick={() => fileRef.current?.click()}
-                style={{ border: `2px dashed ${dragOver ? T.accent : T.border}`, borderRadius: 13, padding: "26px 20px", textAlign: "center", cursor: "pointer", background: dragOver ? `${T.accent}08` : "transparent", transition: "all .2s", marginBottom: 16 }}>
-                <div style={{ fontSize: 30, marginBottom: 6 }}>🎵</div>
-                <div style={{ color: dragOver ? T.accent : T.muted, fontSize: 14 }}>{dragOver ? "שחרר להעלאה" : "גרור MP3/WAV לכאן"}</div>
-                <div style={{ color: T.muted, fontSize: 12, marginTop: 3 }}>או לחץ לבחירה</div>
+                style={{ border: `2px dashed ${dragOver ? T.accent : T.border}`, borderRadius: 13, padding: "32px 20px", textAlign: "center", cursor: "pointer", background: dragOver ? `${T.accent}08` : "transparent", transition: "all .2s" }}>
+                <div style={{ fontSize: 36, marginBottom: 8 }}>🎵</div>
+                <div style={{ color: dragOver ? T.accent : T.text, fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{dragOver ? "שחרר להעלאה" : "גרור MP3/WAV לכאן"}</div>
+                <div style={{ color: T.muted, fontSize: 13 }}>או לחץ לבחירה</div>
                 <input ref={fileRef} type="file" accept=".mp3,.wav,.flac,.m4a" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
               </div>
-
               {analyzing && (
-                <div style={{ textAlign: "center", padding: 16 }}>
+                <div style={{ textAlign: "center", padding: "16px 0" }}>
                   <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 24, color: T.accent }}>⟳</span>
                   <div style={{ color: T.accent, fontSize: 13, marginTop: 8, fontWeight: 600 }}>AI מנתח את הרצועה...</div>
                 </div>
               )}
               {analysisResult && !analyzing && (
-                <div style={{ background: `${T.accent}12`, border: `1px solid ${T.accent}44`, borderRadius: 12, padding: 16 }}>
-                  <div style={{ color: T.accent, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>✓ נותח בהצלחה</div>
+                <div style={{ background: `${T.accent}12`, border: `1px solid ${T.accent}44`, borderRadius: 12, padding: 14, marginTop: 12 }}>
+                  <div style={{ color: T.accent, fontSize: 12, fontWeight: 700, marginBottom: 8 }}>✓ נותח בהצלחה</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     <span style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", color: T.text, fontSize: 12 }}>{analysisResult.genre}</span>
                     <span style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", color: T.text, fontSize: 12 }}>⚡ {analysisResult.energy}%</span>
@@ -533,14 +555,13 @@ function AdminDashboard({ user, onLogout }) {
                   </div>
                 </div>
               )}
+              {uploading && !analyzing && (
+                <div style={{ textAlign: "center", color: T.accent, padding: 16 }}>
+                  <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 20 }}>⟳</span>
+                  <div style={{ fontSize: 13, marginTop: 8 }}>שומר לספרייה...</div>
+                </div>
+              )}
             </div>
-
-            {uploading && !analyzing && (
-              <div style={{ textAlign: "center", color: T.accent, padding: 16 }}>
-                <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 20 }}>⟳</span>
-                <div style={{ fontSize: 13, marginTop: 8 }}>שומר לספרייה...</div>
-              </div>
-            )}
           </div>
         )}
 
@@ -553,11 +574,11 @@ function AdminDashboard({ user, onLogout }) {
             {tracks.length === 0 ? (
               <div style={{ textAlign: "center", padding: "40px 0", color: T.muted }}>
                 <div style={{ fontSize: 36, marginBottom: 10, opacity: .3 }}>🎼</div>
-                <div>הספרייה ריקה -- התחל להעלות מוזיקה מ-Suno</div>
+                <div>הספרייה ריקה — התחל להעלות מוזיקה מ-Suno</div>
               </div>
             ) : tracks.map((t, i) => (
               <div key={t.id || i} className="card" style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 9, background: `hsl(${i * 47}, 60%, 25%)`, border: `1px solid hsl(${i * 47}, 60%, 35%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🎵</div>
+                <div style={{ width: 38, height: 38, borderRadius: 9, background: `hsl(${i * 47}, 50%, 85%)`, border: `1px solid hsl(${i * 47}, 50%, 75%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🎵</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: T.text, fontSize: 14, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.name}</div>
                   <div style={{ color: T.muted, fontSize: 11, marginTop: 2 }}>{t.genre} · ⚡{t.energy}%{t.mood_tags ? ` · ${t.mood_tags}` : ""}</div>
