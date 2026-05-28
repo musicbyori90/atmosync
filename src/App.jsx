@@ -170,7 +170,7 @@ return (
       <span style={{ background: `linear-gradient(135deg, ${T.accent}, ${T.accent2})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>בכל שעה, אוטומטית</span>
     </h1>
     <p style={{ color: T.muted, fontSize: 16, lineHeight: 1.7, marginBottom: 32 }}>
-      פשוט תגיד לנו מה העסק שלך ומה שעות הפעילות — AtmoSync יבנה את לוח המוזיקה היומי אוטומטית.
+      פשוט תגיד לנו מה העסק שלך ומה שעות הפעילות -- AtmoSync יבנה את לוח המוזיקה היומי אוטומטית.
     </p>
     <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 48 }}>
       <button className="btn-p" onClick={onSignup} style={{ padding: "13px 28px", fontSize: 15, borderRadius: 13 }}>התחל בחינם ←</button>
@@ -368,7 +368,7 @@ return (
       <div className="fade-up">
         <button onClick={() => setStep("type")} style={{ background: "none", border: "none", color: T.muted, cursor: "pointer", fontSize: 13, marginBottom: 14, padding: 0 }}>← חזרה</button>
         <div style={{ color: T.accent, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>שלב 2</div>
-        <h2 style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 20 }}>{BUSINESS_TYPES[btype]?.icon} {btype} — איזה סוג?</h2>
+        <h2 style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 20 }}>{BUSINESS_TYPES[btype]?.icon} {btype} -- איזה סוג?</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
           {BUSINESS_TYPES[btype]?.subtypes.map(sub => (
             <button key={sub} onClick={() => { setSubtype(sub); setStep("hours"); }} style={{ background: T.card, border: `1.5px solid ${T.border}`, borderRadius: 11, padding: "13px 10px", cursor: "pointer", color: T.muted, fontSize: 13, transition: "all .2s", textAlign: "center" }}
@@ -407,7 +407,7 @@ return (
         <button onClick={() => setStep("hours")} style={{ background: "none", border: "none", color: T.muted, cursor: "pointer", fontSize: 13, marginBottom: 14, padding: 0 }}>← חזרה</button>
         <div style={{ color: "#FFD166", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>שלב 4 · Enterprise</div>
         <h2 style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 4 }}>🏨 אזורי המלון</h2>
-        <p style={{ color: T.muted, fontSize: 13, marginBottom: 20 }}>בחר את האזורים שרוצים מוזיקה נפרדת — כל אחד ינגן בו זמנית</p>
+        <p style={{ color: T.muted, fontSize: 13, marginBottom: 20 }}>בחר את האזורים שרוצים מוזיקה נפרדת -- כל אחד ינגן בו זמנית</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9, marginBottom: 24 }}>
           {HOTEL_ZONES.map(zone => {
             const sel = zones.includes(zone);
@@ -545,7 +545,7 @@ return (
         {tracks.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0", color: T.muted }}>
             <div style={{ fontSize: 36, marginBottom: 10, opacity: .3 }}>🎼</div>
-            <div>הספרייה ריקה — התחל להעלות מוזיקה מ-Suno</div>
+            <div>הספרייה ריקה -- התחל להעלות מוזיקה מ-Suno</div>
           </div>
         ) : tracks.map((t, i) => (
           <div key={t.id || i} className="card" style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
@@ -639,7 +639,7 @@ return (
           </div>
         )}
 
-        {/* Volume — per zone for enterprise */}
+        {/* Volume -- per zone for enterprise */}
         {isEnterprise ? (
           <div className="card" style={{ padding: 18 }}>
             <div style={{ color: T.muted, fontSize: 11, letterSpacing: 1, marginBottom: 14 }}>עוצמת קול לפי אזור</div>
