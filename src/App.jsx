@@ -389,11 +389,11 @@ return (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
           <div>
             <label style={{ color: T.muted, fontSize: 11, display: "block", marginBottom: 7, letterSpacing: 1 }}>פתיחה</label>
-            <input type="time" value={hours.open} onChange={e => setHours(h => ({ ...h, open: e.target.value }))} style={inp} />
+            <input type="time" value={hours.open} onChange={e => setHours(h => ({ . . .h, open: e.target.value }))} style={inp} />
           </div>
           <div>
             <label style={{ color: T.muted, fontSize: 11, display: "block", marginBottom: 7, letterSpacing: 1 }}>סגירה</label>
-            <input type="time" value={hours.close} onChange={e => setHours(h => ({ ...h, close: e.target.value }))} style={inp} />
+            <input type="time" value={hours.close} onChange={e => setHours(h => ({ . . .h, close: e.target.value }))} style={inp} />
           </div>
         </div>
         <button className="btn-p" onClick={() => isHotel ? setStep("zones") : doGenerate()} style={{ width: "100%", padding: "14px 0", fontSize: 15, borderRadius: 13 }}>
@@ -412,7 +412,7 @@ return (
           {HOTEL_ZONES.map(zone => {
             const sel = zones.includes(zone);
             return (
-              <button key={zone} onClick={() => setZones(p => sel ? p.filter(z => z !== zone) : [...p, zone])} style={{ background: sel ? "#FFD16618" : T.card, border: `1.5px solid ${sel ? "#FFD166" : T.border}`, borderRadius: 11, padding: "12px 10px", cursor: "pointer", color: sel ? "#fff" : T.muted, fontSize: 13, transition: "all .2s", textAlign: "center" }}>
+              <button key={zone} onClick={() => setZones(p => sel ? p.filter(z => z !== zone) : [. . .p, zone])} style={{ background: sel ? "#FFD16618" : T.card, border: `1.5px solid ${sel ? "#FFD166" : T.border}`, borderRadius: 11, padding: "12px 10px", cursor: "pointer", color: sel ? "#fff" : T.muted, fontSize: 13, transition: "all .2s", textAlign: "center" }}>
                 {sel && "✓ "}{zone}
               </button>
             );
@@ -507,7 +507,7 @@ return (
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <input placeholder="שם הרצועה" value={uploadName} onChange={e => setUploadName(e.target.value)} style={inp} />
-            <select value={uploadGenre} onChange={e => setUploadGenre(e.target.value)} style={{ ...inp }}>
+            <select value={uploadGenre} onChange={e => setUploadGenre(e.target.value)} style={{ . . .inp }}>
               {GENRE_TAGS.map(g => <option key={g}>{g}</option>)}
             </select>
             <div>
@@ -522,7 +522,7 @@ return (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {MOOD_TAGS.map(m => {
                   const sel = uploadMoods.includes(m);
-                  return <button key={m} onClick={() => setUploadMoods(p => sel ? p.filter(x => x !== m) : [...p, m])} style={{ background: sel ? `${T.accent}22` : T.surface, border: `1px solid ${sel ? T.accent : T.border}`, borderRadius: 20, padding: "5px 12px", color: sel ? T.accent : T.muted, fontSize: 12, cursor: "pointer", transition: "all .2s" }}>{m}</button>;
+                  return <button key={m} onClick={() => setUploadMoods(p => sel ? p.filter(x => x !== m) : [. . .p, m])} style={{ background: sel ? `${T.accent}22` : T.surface, border: `1px solid ${sel ? T.accent : T.border}`, borderRadius: 20, padding: "5px 12px", color: sel ? T.accent : T.muted, fontSize: 12, cursor: "pointer", transition: "all .2s" }}>{m}</button>;
                 })}
               </div>
             </div>
@@ -531,7 +531,7 @@ return (
 
         {uploading && <div style={{ textAlign: "center", color: T.accent, padding: 16 }}>
           <span style={{ animation: "spin 1s linear infinite", display: "inline-block", fontSize: 20 }}>⟳</span>
-          <div style={{ fontSize: 13, marginTop: 8 }}>מעלה...</div>
+          <div style={{ fontSize: 13, marginTop: 8 }}>מעלה. . .</div>
         </div>}
       </div>
     )}
